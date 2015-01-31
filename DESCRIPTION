@@ -1,0 +1,23 @@
+Package: newsfreq
+Type: Package
+Title: Search for keyword frequencies in news articles via newsfreq.com
+Version: 0.1
+Date: 2015-01-31
+Author: Bob Rudis (@hrbrmstr)
+Maintainer: Bob Rudis <bob@rudis.net>
+Description: newsfreq provides access to the newsfreq.com API, which enables
+    searching media sources for keywords in news articles.
+URL: http://github.com/hrbrmstr/newsfreq
+BugReports: https://github.com/hrbrmstr/newsfreq/issues
+Suggests:
+    testthat
+Depends:
+    R (>= 3.0),
+    magrittr
+License: MIT + file LICENSE
+Imports:
+    httr (>= 0.3.0),
+    jsonlite,
+    dplyr,
+    stringr,
+    V8
