@@ -96,7 +96,7 @@ gg <- gg + theme(panel.border=element_blank())
 gg
 ```
 
-![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)
+<img src="README_files/figure-markdown_github/unnamed-chunk-5-1.png" title="" alt="" width="768" />
 
 ### Test Results
 
@@ -107,7 +107,7 @@ library(testthat)
 date()
 ```
 
-    ## [1] "Sat Jan 31 11:39:25 2015"
+    ## [1] "Sat Jan 31 11:42:15 2015"
 
 ``` r
 test_dir("tests/")

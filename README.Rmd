@@ -66,7 +66,7 @@ bind_rows(breach, terrorism, warming, bitcoin) %>%
   select(date_from, search_terms, count) -> combined
 ```
 
-```{r fig.width=8, fig.height=3}
+```{r fig.width=8, fig.height=3, fig.retina=2}
 gg <- ggplot(combined, aes(x=date_from, y=count, group=search_terms))
 gg <- gg + geom_line(aes(color=search_terms))
 gg <- gg + geom_point(aes(color=search_terms), size=1.5)
