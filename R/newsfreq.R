@@ -120,6 +120,11 @@ news_search <- function(keywords=NA, target="",
 
 }
 
+.onAttach <- function(...) {
+  if (!interactive()) return()
+  packageStartupMessage("Data provided by DataNerves; Quantitative data sourced from NewsLibrary.com for use for educational, scholarly and news reporting purposes only")
+}
+
 # from Hmisc
 ucfirst <- function (string) {
   capped <- grep("^[^A-Z]*$", string, perl = TRUE)

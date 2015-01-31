@@ -37,6 +37,50 @@ library(newsfreq)
 # current verison
 packageVersion("newsfreq")
 
+library(newsfreq)
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(tidyr)
+library(ggthemes)
+```
+
+```{r cache=TRUE}
+breach <- news_search(keywords="(data breach) OR hacking OR (denial of service)",
+                      date_from="2010-01-01", date_to="2014-01-31")
+head(breach)
+
+breach %>%
+  mutate(search_terms="breach/hack/dos") -> breach
+
+terrorism <- news_search(keywords="terrorism",
+                   date_from="2010-01-01", date_to="2014-01-31")
+
+warming <- news_search(keywords="global warming",
+                   date_from="2010-01-01", date_to="2014-01-31")
+
+bitcoin <- news_search(keywords="bitcoin",
+                       date_from="2010-01-01", date_to="2014-01-31")
+
+bind_rows(breach, terrorism, warming, bitcoin) %>%
+  select(date_from, search_terms, count) -> combined
+```
+
+```{r fig.width=8, fig.height=3}
+gg <- ggplot(combined, aes(x=date_from, y=count, group=search_terms))
+gg <- gg + geom_line(aes(color=search_terms))
+gg <- gg + geom_point(aes(color=search_terms), size=1.5)
+gg <- gg + scale_x_date(breaks=date_breaks("year"),
+                        labels=date_format("%Y"), expand=c(0,0))
+gg <- gg + scale_y_continuous(label=comma)
+gg <- gg + scale_color_tableau(name="Topic")
+gg <- gg + labs(x=NULL, y="# Articles", title="Keyword frequency since 2010")
+gg <- gg + theme_bw()
+gg <- gg + theme(panel.grid=element_blank())
+gg <- gg + theme(panel.border=element_blank())
+gg
+
+
 ```
 
 ### Test Results

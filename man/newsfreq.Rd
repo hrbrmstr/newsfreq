@@ -4,9 +4,9 @@
 \name{newsfreq}
 \alias{newsfreq}
 \alias{newsfreq-package}
-\title{A package to ...}
+\title{A package to search for (via \url{http://newsfreq.com/}) keyword frequencies in news articles}
 \description{
-A package to ...
+A package to search for (via \url{http://newsfreq.com/}) keyword frequencies in news articles
 }
 \author{
 Bob Rudis (@hrbrmstr)
