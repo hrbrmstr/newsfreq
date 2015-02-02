@@ -12,6 +12,7 @@ newsfreq is a package that provides access to the newsfreq.com API, which enable
 The following functions are implemented:
 
 - `news_search` - search for articles
+- `autoplot.newsfreq` - ggplot2 convenience method
 
 The following data sets are included:
 
@@ -46,7 +47,7 @@ library(tidyr)
 library(ggthemes)
 ```
 
-```{r cache=FALSE}
+```{r cache=TRUE}
 breach <- news_search(keywords="(data breach) OR hacking OR (denial of service)",
                       date_from="2010-01-01", date_to="2014-12-31")
 head(breach)

@@ -3,6 +3,7 @@ newsfreq is a package that provides access to the newsfreq.com API, which enable
 The following functions are implemented:
 
 -   `news_search` - search for articles
+-   `autoplot.newsfreq` - ggplot2 convenience method
 
 The following data sets are included:
 
