@@ -9,6 +9,7 @@ The following data sets are included:
 ### News
 
 -   Version `0.1` released
+-   Version `0.2` released - added a `pct` column to the returned data frame (under certain conditions); made an S3 `newsfreq` class for the results; added an `autoplot` convenience method for generating quick graphs of results.
 
 ### Installation
 
@@ -25,7 +26,7 @@ library(newsfreq)
 packageVersion("newsfreq")
 ```
 
-    ## [1] '0.1'
+    ## [1] '0.2'
 
 ``` r
 library(newsfreq)
@@ -52,30 +53,37 @@ library(ggthemes)
 
 ``` r
 breach <- news_search(keywords="(data breach) OR hacking OR (denial of service)",
-                      date_from="2010-01-01", date_to="2014-01-31")
+                      date_from="2010-01-01", date_to="2014-12-31")
 head(breach)
 ```
 
     ##    date_from    date_to year month_abb month count search_date                                    search_terms
-    ## 1 2010-01-01 2010-01-31 2010       Jan    01  3197  2015-01-31 (data breach) OR hacking OR (denial of service)
-    ## 2 2010-02-01 2010-02-28 2010       Feb    02  3140  2015-01-31 (data breach) OR hacking OR (denial of service)
-    ## 3 2010-03-01 2010-03-31 2010       Mar    03  3721  2015-01-31 (data breach) OR hacking OR (denial of service)
-    ## 4 2010-04-01 2010-04-30 2010       Apr    04  3732  2015-01-31 (data breach) OR hacking OR (denial of service)
-    ## 5 2010-05-01 2010-05-31 2010       May    05  3307  2015-01-31 (data breach) OR hacking OR (denial of service)
-    ## 6 2010-06-01 2010-06-30 2010       Jun    06  2964  2015-01-31 (data breach) OR hacking OR (denial of service)
+    ## 1 2010-01-01 2010-01-31 2010       Jan    01  3197  2015-02-02 (data breach) OR hacking OR (denial of service)
+    ## 2 2010-02-01 2010-02-28 2010       Feb    02  3140  2015-02-02 (data breach) OR hacking OR (denial of service)
+    ## 3 2010-03-01 2010-03-31 2010       Mar    03  3721  2015-02-02 (data breach) OR hacking OR (denial of service)
+    ## 4 2010-04-01 2010-04-30 2010       Apr    04  3732  2015-02-02 (data breach) OR hacking OR (denial of service)
+    ## 5 2010-05-01 2010-05-31 2010       May    05  3307  2015-02-02 (data breach) OR hacking OR (denial of service)
+    ## 6 2010-06-01 2010-06-30 2010       Jun    06  2964  2015-02-02 (data breach) OR hacking OR (denial of service)
+    ##          pct
+    ## 1 0.08149791
+    ## 2 0.08004487
+    ## 3 0.09485572
+    ## 4 0.09513613
+    ## 5 0.08430203
+    ## 6 0.07555827
 
 ``` r
 breach %>%
   mutate(search_terms="breach/hack/dos") -> breach
 
 terrorism <- news_search(keywords="terrorism",
-                   date_from="2010-01-01", date_to="2014-01-31")
+                   date_from="2010-01-01", date_to="2014-12-31")
 
 warming <- news_search(keywords="global warming",
-                   date_from="2010-01-01", date_to="2014-01-31")
+                   date_from="2010-01-01", date_to="2014-12-31")
 
 bitcoin <- news_search(keywords="bitcoin",
-                       date_from="2010-01-01", date_to="2014-01-31")
+                       date_from="2010-01-01", date_to="2014-12-31")
 
 bind_rows(breach, terrorism, warming, bitcoin) %>%
   select(date_from, search_terms, count) -> combined
@@ -107,7 +115,7 @@ library(testthat)
 date()
 ```
 
-    ## [1] "Sat Jan 31 11:42:15 2015"
+    ## [1] "Mon Feb  2 06:46:05 2015"
 
 ``` r
 test_dir("tests/")

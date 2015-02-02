@@ -17,11 +17,9 @@
 #'       \item \code{section} Search for articles appearing in a particular news section
 #'       \item \code{source} Search for articles from a particular news source
 #'     }
-#'     Search dates must not be in the future and must also not be on the current day (they won't be in the API database). \cr
-#'     They can be an atomic character vector in \code{mm/dd/YYYY} format or anything that can be coerced to a \code{Date} class.
-#' @return \code{data.frame} of search results. If \code{summarize} is "\code{monthly}",
-#'     then the \code{data.frame} will also include \code{year}, \code{month} and
-#'     \code{month_abb}. For "\code{annual}", only \code{year} will be added to the results.
+#'     Search dates must not be in the future and must also not be on the current day (they won't be in the API database).
+#'     They can be an atomic character vector in a format \code{as.Date} will recognize or
+#'     anything that can be coerced to a \code{Date} class.
 #' @param keywords search term(s) to query (see Details for specifics)
 #' @param target news article component to search in (see Details for valid values and their meaning)
 #' @param date_from start date for the search (<= \code{date_to} and not current day or future date).
@@ -32,24 +30,33 @@
 #'     Entering 'Fox News' or 'The Boston Globe' will search only articles from sources matching that name.
 #'     Full list available on \href{http://bit.ly/newsbanksources}{NewsBank}
 #' @param summarize Either "\code{monthly}" or "\code{annual}"
+#' @return \code{data.frame} (with additional class of \code{newsfreq}) of search
+#'     results. If \code{summarize} is "\code{monthly}",
+#'     then the results will also include \code{year}, \code{month} and
+#'     \code{month_abb}. For "\code{annual}", only \code{year} will be added to
+#'     the results.
+#' @note The "\code{percent}" value is a per-annum calculation and will only be calculated
+#'     and added to the results of searches that are summarized \code{monthly} and span full years.
+#'     It is at best a crude way to normalize the results since the number of news sources
+#'     (and, hence, articles) changes over time.
 #' @export
 #' @examples \dontrun{
 #' news_search("data breach", date_from="2014-01-01", date_to="2014-12-31")
-#' ##     date_from    date_to count search_date search_terms
-#' ## 1  2014-01-01 2014-01-31  3963  2015-01-31  data breach
-#' ## 2  2014-02-01 2014-02-28  2856  2015-01-31  data breach
-#' ## 3  2014-03-01 2014-03-31  2589  2015-01-31  data breach
-#' ## 4  2014-04-01 2014-04-30  2170  2015-01-31  data breach
-#' ## 5  2014-05-01 2014-05-31  2680  2015-01-31  data breach
-#' ## 6  2014-06-01 2014-06-30  1973  2015-01-31  data breach
-#' ## 7  2014-07-01 2014-07-31  1962  2015-01-31  data breach
-#' ## 8  2014-08-01 2014-08-31  2585  2015-01-31  data breach
-#' ## 9  2014-09-01 2014-09-30  3326  2015-01-31  data breach
-#' ## 10 2014-10-01 2014-10-31  2862  2015-01-31  data breach
-#' ## 11 2014-11-01 2014-11-30  2473  2015-01-31  data breach
-#' ## 12 2014-12-01 2014-12-31  2166  2015-01-31  data breach
+#' ##     date_from    date_to year month_abb month count search_date search_terms        pct
+#' ## 1  2014-01-01 2014-01-31 2014       Jan    01  3963  2015-02-02  data breach 0.12539155
+#' ## 2  2014-02-01 2014-02-28 2014       Feb    02  2856  2015-02-02  data breach 0.09036545
+#' ## 3  2014-03-01 2014-03-31 2014       Mar    03  2589  2015-02-02  data breach 0.08191742
+#' ## 4  2014-04-01 2014-04-30 2014       Apr    04  2170  2015-02-02  data breach 0.06866002
+#' ## 5  2014-05-01 2014-05-31 2014       May    05  2680  2015-02-02  data breach 0.08479671
+#' ## 6  2014-06-01 2014-06-30 2014       Jun    06  1973  2015-02-02  data breach 0.06242683
+#' ## 7  2014-07-01 2014-07-31 2014       Jul    07  1962  2015-02-02  data breach 0.06207879
+#' ## 8  2014-08-01 2014-08-31 2014       Aug    08  2585  2015-02-02  data breach 0.08179086
+#' ## 9  2014-09-01 2014-09-30 2014       Sep    09  3326  2015-02-02  data breach 0.10523651
+#' ## 10 2014-10-01 2014-10-31 2014       Oct    10  2862  2015-02-02  data breach 0.09055529
+#' ## 11 2014-11-01 2014-11-30 2014       Nov    11  2473  2015-02-02  data breach 0.07824711
+#' ## 12 2014-12-01 2014-12-31 2014       Dec    12  2166  2015-02-02  data breach 0.06853346
 #' }
-news_search <- function(keywords=NA, target="",
+news_search <- newsfreq <- function(keywords=NA, target="",
                         date_from=(Sys.Date()-1), date_to=(Sys.Date()-1),
                         source="",
                         summarize="monthly") {
@@ -113,10 +120,94 @@ news_search <- function(keywords=NA, target="",
            search_terms=SearchString) -> dat
 
   if (summarize == "annual") {
-    dat %>% select(-month_abb, -month)
+
+    dat %>% select(-month_abb, -month) -> dat
+
   } else {
-    dat
+
+    mods <- dat %>% group_by(year) %>% summarize(tot=n() %% 12)
+
+    if (all(mods$tot == 0)) {
+      dat %>%
+        group_by(year) %>%
+        mutate(tot=sum(count),
+               pct=count/tot) %>%
+        ungroup %>%
+        select(-tot) -> dat
+    }
+
   }
+
+  class(dat) <- c("newsfreq", "data.frame")
+
+  dat
+
+}
+
+#' @rdname news_search
+#' @export
+is.newsfreq <- function(x) inherits(x, "newsfreq")
+
+#' @title Autoplot for \code{newsfreq} objects
+#' @description Quick method with sane defaults for generating a \code{ggplot}
+#'        plot for \code{news_search} results.
+#' @param data a \code{newsfreq} object
+#' @param breaks A character string, containing one of "\code{day}", "\code{week}",
+#'        "\code{month}", "\code{quarter}" or "\code{year}". This can optionally
+#'        be preceded by a (positive or negative) integer and a space, or followed
+#'        by "\code{s}". Passed to \code{scale_x_date}. Defaults to "\code{year}".
+#' @param label_format passed to \code{scale_x_date}. Defaults to "\code{\%Y}"
+#' @param value either "\code{count}" for raw article counts or "\code{percent}"
+#'        Defaults to "\code{count}".
+#' @param add_point add points to the lines? Default "\code{FALSE}" (do not plot points)
+#' @return \code{ggplot} object
+#' @export
+autoplot.newsfreq <- function(data, breaks="year", label_format="%Y",
+                              value="count", add_point=FALSE) {
+
+  if (!inherits(dat, "newsfreq")) {
+    stop("'data' must be a 'newsfreq' object")
+  }
+
+  if (!value %in% c("count", "percent")) {
+    stop("'value' must be either 'count' or 'percent'")
+  }
+
+  if (value == "percent" & !"pct" %in% names(data)) {
+    value <- "count"
+    message("'pct' column not found, using 'count'")
+  }
+
+  y_lab <- "# Articles"
+
+  if (value == "count") {
+    gg <- ggplot(data, aes(x=date_from, y=count))
+  } else {
+    gg <- ggplot(data, aes(x=date_from, y=pct))
+    y_lab <- "% Articles"
+  }
+
+  gg <- gg + geom_line()
+
+  if (add_point) gg <- gg + geom_point(size=1.5)
+
+  gg <- gg + scale_x_date(breaks=date_breaks(breaks),
+                          labels=date_format(label_format), expand=c(0,0))
+
+  if (value == "count") {
+    gg <- gg + scale_y_continuous(label=comma)
+    gg <- gg + labs(x=NULL, y="# Articles")
+  } else {
+    gg <- gg + scale_y_continuous(label=percent)
+    gg <- gg + labs(x=NULL, y="% Articles")
+  }
+
+  gg <- gg + ggtitle(sprintf(unique(data$search_terms)))
+
+  gg <- gg + theme_bw()
+  gg <- gg + theme(panel.grid=element_blank())
+  gg <- gg + theme(panel.border=element_blank())
+  gg
 
 }
 
@@ -132,6 +223,7 @@ ucfirst <- function (string) {
   return(string)
 }
 
+# helper for fugly "Date(#)" components
 js_date_parse <- function(x) {
   str_extract(x, "[[:digit:]]+") %>%
     as.numeric %>%

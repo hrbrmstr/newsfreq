@@ -2,7 +2,7 @@
 #' @name newsfreq
 #' @docType package
 #' @author Bob Rudis (@@hrbrmstr)
-#' @import dplyr httr stringr V8
+#' @import dplyr httr stringr V8 ggplot2 scales
 #' @importFrom magrittr divide_by
 #' @importFrom jsonlite fromJSON
 NULL

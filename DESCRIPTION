@@ -1,8 +1,8 @@
 Package: newsfreq
 Type: Package
 Title: Search for keyword frequencies in news articles via newsfreq.com
-Version: 0.1
-Date: 2015-01-31
+Version: 0.2
+Date: 2015-02-01
 Author: Bob Rudis (@hrbrmstr)
 Maintainer: Bob Rudis <bob@rudis.net>
 Description: newsfreq provides access to the newsfreq.com API, which enables
@@ -20,4 +20,6 @@ Imports:
     jsonlite,
     dplyr,
     stringr,
-    V8
+    V8,
+    ggplot2,
+    scales

@@ -1,7 +1,7 @@
 ---
 title: "README"
 author: "Bob Rudis"
-date: January 31, 2015
+date: February 2, 2015
 output:
   md_document:
     variant: markdown_github
@@ -18,6 +18,7 @@ The following data sets are included:
 ### News
 
 - Version `0.1` released
+- Version `0.2` released - added a `pct` column to the returned data frame (under certain conditions); made an S3 `newsfreq` class for the results; added an `autoplot` convenience method for generating quick graphs of results.
 
 ### Installation
 
@@ -45,22 +46,22 @@ library(tidyr)
 library(ggthemes)
 ```
 
-```{r cache=TRUE}
+```{r cache=FALSE}
 breach <- news_search(keywords="(data breach) OR hacking OR (denial of service)",
-                      date_from="2010-01-01", date_to="2014-01-31")
+                      date_from="2010-01-01", date_to="2014-12-31")
 head(breach)
 
 breach %>%
   mutate(search_terms="breach/hack/dos") -> breach
 
 terrorism <- news_search(keywords="terrorism",
-                   date_from="2010-01-01", date_to="2014-01-31")
+                   date_from="2010-01-01", date_to="2014-12-31")
 
 warming <- news_search(keywords="global warming",
-                   date_from="2010-01-01", date_to="2014-01-31")
+                   date_from="2010-01-01", date_to="2014-12-31")
 
 bitcoin <- news_search(keywords="bitcoin",
-                       date_from="2010-01-01", date_to="2014-01-31")
+                       date_from="2010-01-01", date_to="2014-12-31")
 
 bind_rows(breach, terrorism, warming, bitcoin) %>%
   select(date_from, search_terms, count) -> combined
@@ -79,8 +80,6 @@ gg <- gg + theme_bw()
 gg <- gg + theme(panel.grid=element_blank())
 gg <- gg + theme(panel.border=element_blank())
 gg
-
-
 ```
 
 ### Test Results
